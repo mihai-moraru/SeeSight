@@ -1,0 +1,38 @@
+# ──────────────────────────────────────────────────────────────
+# Shared Flutter setup — composite action
+# ──────────────────────────────────────────────────────────────
+#
+# Every CI workflow calls this action so the Flutter version is
+# defined in ONE place.
+#
+# When you upgrade locally:
+#   1. Run `flutter --version`
+#   2. Update the default value of `flutter-version` below
+#   3. Run `dart format .` and commit any reformatted files
+#
+# TODO: Once Dart formatting is stable across releases, replace
+#       the pinned default with `channel: stable` in the
+#       flutter-action step and remove the version input.
+# ──────────────────────────────────────────────────────────────
+
+name: Setup Flutter
+description: Install a pinned Flutter SDK and restore pub cache
+
+inputs:
+  flutter-version:
+    description: 'Override the default Flutter version (optional)'
+    required: false
+    # ⬇️  UPDATE THIS when you upgrade Flutter locally
+    default: '3.38.2'
+
+runs:
+  using: composite
+  steps:
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ inputs.flutter-version }}
+        cache: true
+
+    - name: Install dependencies
+      shell: bash
+      run: flutter pub get

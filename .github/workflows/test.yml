@@ -1,15 +1,13 @@
-# Reusable workflow — Tests & Coverage
-# Called from ci.yml. Do not add push/pull_request triggers here.
+# Tests & Coverage
+# Flutter version is managed in .github/actions/setup-flutter/action.yml
 
 name: Test
 
 on:
-  workflow_call:
-    inputs:
-      flutter-version:
-        description: 'Flutter version to use'
-        required: true
-        type: string
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -20,14 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ inputs.flutter-version }}
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
+      - uses: ./.github/actions/setup-flutter
 
       - name: Run tests with coverage
         run: flutter test --coverage
@@ -45,5 +36,5 @@ jobs:
         with:
           files: coverage/lcov.info
           fail_ci_if_error: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        # env:
+        #   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
